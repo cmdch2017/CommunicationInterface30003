@@ -1,0 +1,14 @@
+server:
+  port: 8088
+netty:
+  # 重新连接时间间隔（单位：秒）
+  interval: 4
+  # 处理线程数
+  thread-number: 1
+
+endpoint:
+  # Web指令生成服务
+  distribution:
+    port: 30003
+    host: localhost
+

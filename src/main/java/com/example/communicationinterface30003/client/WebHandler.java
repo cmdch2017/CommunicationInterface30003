@@ -10,9 +10,11 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.example.communicationinterface30003.constant.Constants.*;
+import static com.example.communicationinterface30003.excel.ExcelWriter.writeToExcel;
 
 //5c5c5c5c445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABBCCDDEEFF00112233445566778899AABB75757575
 
@@ -59,7 +61,9 @@ public class WebHandler extends SimpleChannelInboundHandler<ByteBuf> {
         long currentTimestamp = System.currentTimeMillis();
         //比较两次报文
         if (!previousMessageFields.isEmpty()) {
-            WebUtil.compareAndPrintChanges(previousMessageFields, currentFields);
+            List<Map<String, Object>> resultList=WebUtil.compareAndPrintChanges(previousMessageFields, currentFields);
+
+            writeToExcel(resultList);
         }
         //更新报文
         previousMessageFields = currentFields;

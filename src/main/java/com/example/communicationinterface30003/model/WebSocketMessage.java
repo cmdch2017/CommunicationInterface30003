@@ -12,7 +12,7 @@ public class WebSocketMessage {
 
     private JSONObject bodyMessage;
 
-    private String msg;
+    private Object msg;
 
     private String token;
 }

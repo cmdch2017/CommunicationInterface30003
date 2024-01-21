@@ -12,7 +12,7 @@ public class Physics {
     private String chineseName;
     private Integer index;
     /**
-     * 使用符号位
+     * 弃用，使用符号位
      *
      * @author lst
      * @date 2023/12/25 11:01
@@ -21,7 +21,7 @@ public class Physics {
      */
     private Boolean useSign = false;
     /**
-     * 判断0不正常，1正常
+     * 判断 0不正常，1正常
      *
      * @author lst
      * @date 2023/12/27 10:57

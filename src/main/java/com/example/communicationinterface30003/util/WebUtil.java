@@ -5,8 +5,7 @@ import com.example.communicationinterface30003.constant.Constants;
 import com.example.communicationinterface30003.entity.Physics;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author lst
@@ -65,36 +64,63 @@ public class WebUtil {
      * @author lst
      * @date 2023/12/21 10:43
      */
-    public static void compareAndPrintChanges(Map<Physics, byte[]> previousMessageFields, Map<Physics, byte[]> currentMessageFields) {
+    public static List<Map<String, Object>> compareAndPrintChanges(Map<Physics, byte[]> previousMessageFields, Map<Physics, byte[]> currentMessageFields) {
+        List<Map<String, Object>> resultList = new ArrayList<>();
         for (Map.Entry<Physics, byte[]> entry : currentMessageFields.entrySet()) {
+            String previousValueResult;
+            String currentValueResult;
             Physics fieldName = entry.getKey();
             byte[] currentValue = entry.getValue();
             byte[] previousValue = previousMessageFields.get(fieldName);
 
             if (previousValue != null && !Arrays.equals(currentValue, previousValue)) {
+                Map<String, Object> resultMap = new HashMap<>();
+                String str = "";
+
                 if (previousValue.length == 4) {
-                    if (fieldName.getUseSign()) {
-                        System.out.printf("%s ，变化前大端的十进制值 '%d' ，变化后大端的十进制值 '%d'%n", fieldName, bytesToInt(swap(previousValue)), bytesToInt(swap(currentValue)));
-                        WebSocketMessageUtil.sendMessageToAll(300, String.format("%s ，变化前大端的十进制值 '%d' ，变化后大端的十进制值 '%d'%n", fieldName, bytesToInt(swap(previousValue)), bytesToInt(swap(currentValue))));
-                    } else {
-                        System.out.printf("%s ，变化前大端的十进制值 '%d' ，变化后大端的十进制值 '%d'%n", fieldName, bytesToInt(swap(previousValue)), bytesToInt(swap(currentValue)));
-                    }
+                    // 采用大端变化值
+                    //TODO 处理符号位
+                    previousValueResult = String.valueOf(bytesToInt(swap(previousValue)));
+                    currentValueResult = String.valueOf(bytesToInt(swap(currentValue)));
+                    str = String.format("%s ，变化前'%d' ，变化后'%d'%n", fieldName, bytesToInt(swap(previousValue)), bytesToInt(swap(currentValue)));
                 } else {
                     if (fieldName.getDetermine()) {
                         if (HexUtil.encodeHexStr(currentValue).equals("00")) {
                             System.err.printf("%s不正常!!!%n", fieldName);
                         }
                     }
-                    System.out.printf("%s ，变化前的原始十六进制值 '%s' ，变化后的原始十六进制值 '%s'%n", fieldName, HexUtil.encodeHexStr(previousValue), HexUtil.encodeHexStr(currentValue));
+                    previousValueResult = HexUtil.encodeHexStr(previousValue) + "H";
+                    currentValueResult = HexUtil.encodeHexStr(currentValue) + "H";
+                    str = String.format("%s ，变化前'%sH' ，变化后'%sH'%n", fieldName, HexUtil.encodeHexStr(previousValue), HexUtil.encodeHexStr(currentValue));
                 }
 
-                // Print changed index
-                int changedIndex = getChangedIndex(currentValue, previousValue);
-                if (changedIndex != -1) {
-                    int currentIndex = changedIndex + fieldName.getIndex();
-//                    System.out.printf("变化的起始位置索引: %d, 相对位置：%d%n", currentIndex, changedIndex);
+                resultMap.put("变化字段", fieldName.getChineseName());
+                resultMap.put("变化前的值", previousValueResult);
+                resultMap.put("变化后的值", currentValueResult);
+                if (fieldName.getDetermine()) {
+                    if (HexUtil.encodeHexStr(currentValue).equals("00")) {
+                        resultMap.put("状态", "不正常");
+                    } else {
+                        resultMap.put("状态", "正常");
+                    }
                 }
+
+                resultList.add(resultMap);
+                System.out.printf(str);
+
+                // Send message to all
+                WebSocketMessageUtil.sendMessageToAll(300, resultMap);
             }
+        }
+        return resultList;
+    }
+
+
+    private static void printChangedIndex(byte[] currentValue, byte[] previousValue, Physics fieldName, String str) {
+        int changedIndex = getChangedIndex(currentValue, previousValue);
+        if (changedIndex != -1) {
+            int currentIndex = changedIndex + fieldName.getIndex();
+            str += String.format("变化的起始位置索引: %d, 相对位置：%d%n", currentIndex, changedIndex);
         }
     }
 

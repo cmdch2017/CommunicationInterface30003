@@ -55,11 +55,10 @@ public class WebSocketMessageUtil {
     /**
      * 发送到所有用户
      */
-    public static void sendMessageToAll(Integer code, String message) {
+    public static void sendMessageToAll(Integer code, Object message) {
         for (Session session : SESSION_MAP.values()) {
             // 检查会话是否处于打开状态
             if (session.isOpen()) {
-                log.info("检测会话正常*********************************************");
                 sendWebSocketMessage(session, code, message);
             }else{
                 log.warn("有会话已关闭");
@@ -84,7 +83,7 @@ public class WebSocketMessageUtil {
      * @param code
      * @param message
      */
-    public static void sendWebSocketMessage(Session session, Integer code, String message) {
+    public static void sendWebSocketMessage(Session session, Integer code, Object message) {
         WebSocketMessage webSocketMessage = new WebSocketMessage();
         webSocketMessage.setCode(code);
         webSocketMessage.setMsg(message);

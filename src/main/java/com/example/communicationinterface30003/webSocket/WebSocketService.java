@@ -1,4 +1,4 @@
-package com.example.communicationinterface30003.service;
+package com.example.communicationinterface30003.webSocket;
 
 import com.example.communicationinterface30003.util.WebSocketMessageUtil;
 import jakarta.websocket.*;
@@ -12,7 +12,7 @@ import static com.example.communicationinterface30003.util.WebSocketMessageUtil.
 
 
 /**
- * ws://127.0.0.1:8081/api/pad/websocket
+ * ws://127.0.0.1:8088/websocket
  */
 @Component
 @Slf4j

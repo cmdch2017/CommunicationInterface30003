@@ -1,6 +1,7 @@
 package com.example.communicationinterface30003.excel;
 
 import cn.hutool.core.util.ObjectUtil;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -13,13 +14,15 @@ import java.util.Map;
 
 public class ExcelWriter {
 
-    private static final int MAX_ROWS_PER_SHEET = 5000;
+    private static final int MAX_ROWS_PER_SHEET = 1000;
 
     public static void writeToExcel(List<Map<String, Object>> resultList) {
         Workbook workbook;
         Sheet sheet;
 
         File file = new File("changes.xlsx");
+        // Adjust the minimum inflate ratio
+        ZipSecureFile.setMinInflateRatio(0.005); // You can set it to a lower value if needed
 
         if (file.exists()) {
             // If file exists, read existing workbook and sheet
